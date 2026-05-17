@@ -6,7 +6,7 @@ import time
 # Page configuration
 st.set_page_config(page_title="Thermodynamics Property Finder", layout="wide")
 
-# Custom CSS for the new layout requirements
+# Custom CSS for Margin Box, Profile, and Animated Turbine
 st.markdown("""
     <style>
     /* Industrial Background */
@@ -18,7 +18,7 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Title with Margin Box */
+    /* Title Margin Box */
     .title-box {
         border: 3px solid #4a90e2;
         padding: 20px;
@@ -26,7 +26,6 @@ st.markdown("""
         border-radius: 15px;
         text-align: center;
         background: rgba(74, 144, 226, 0.05);
-        box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
     }
     .main-title {
         color: #4a90e2;
@@ -36,7 +35,7 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Created By & Roll Number Section */
+    /* Created By & Roll Number */
     .user-info-bar {
         background: rgba(255, 255, 255, 0.03);
         border-bottom: 2px solid #d4af37;
@@ -52,21 +51,30 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Industrial Button and Steam Effect */
-    .stButton>button {
-        background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%);
-        color: white;
-        border-radius: 50%;
-        width: 140px;
-        height: 140px;
-        border: 4px solid #2c303d;
-        font-weight: bold;
-        margin: 20px auto;
-        display: block;
-        position: relative;
-        z-index: 5;
+    /* Turbine Animation CSS */
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
-    
+    .turbine-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        background: #1e2130;
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        margin: 10px auto;
+        border: 4px solid #3d4256;
+    }
+    .turbine-blade {
+        font-size: 60px;
+        animation: rotate 2s linear infinite;
+        color: #d4af37;
+    }
+
+    /* Steam Animation for Button */
     @keyframes steam {
         0% { transform: translateY(0) scale(1); opacity: 0; }
         50% { opacity: 0.4; }
@@ -81,28 +89,48 @@ st.markdown("""
         filter: blur(8px);
         animation: steam 1.5s infinite;
     }
+    
+    .stButton>button {
+        background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%);
+        color: white;
+        border-radius: 50%;
+        width: 140px;
+        height: 140px;
+        border: 4px solid #2c303d;
+        font-weight: bold;
+        margin: 20px auto;
+        display: block;
+        position: relative;
+        z-index: 5;
+    }
     </style>
     """, unsafe_allow_html=True)
 
 # 1. Main Heading inside Margin Box
-st.markdown("""
-    <div class="title-box">
-        <h1 class="main-title">Thermodynamics Property Finder</h1>
+st.markdown('<div class="title-box"><h1 class="main-title">Thermodynamics Property Finder</h1></div>', unsafe_allow_html=True)
+
+# 2. Profile Section
+st.markdown('<div class="user-info-bar"><p class="user-info-text">Created by: Ramish Ali | Roll Number: 25-ME-87</p></div>', unsafe_allow_html=True)
+
+# 3. Sidebar with Live Turbine Animation
+st.sidebar.title("Industrial Dashboard")
+st.sidebar.write("Core Status: **Stable**")
+
+# Turbine Animation in Sidebar
+st.sidebar.markdown("""
+    <div class="turbine-container">
+        <div class="turbine-blade">⚙️</div>
     </div>
+    <p style="text-align: center; color: #d4af37;">Live Turbine Operation</p>
     """, unsafe_allow_html=True)
 
-# 2. Profile Section: Created by & Roll Number
-st.markdown("""
-    <div class="user-info-bar">
-        <p class="user-info-text">Created by: Ramish Ali | Roll Number: 25-ME-87</p>
-    </div>
-    """, unsafe_allow_html=True)
+st.sidebar.progress(100)
+st.sidebar.info("RPM: 3500 | System Optimal")
 
-# 3. Content Layout
+# 4. Content Layout
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
-    # Changed heading to Input Data
     st.markdown("### 📥 Input Data")
     R = st.number_input("Gas Constant R (J/kg-K)", value=287.0)
     T = st.number_input("Temperature (K)", value=300.0)
@@ -122,19 +150,13 @@ with col2:
     chart_data = pd.DataFrame({'Vol': v, 'Pres': p})
     st.line_chart(chart_data.set_index('Vol'))
 
-# 4. Processing and Results
+# 5. Results
 if calculate:
     with st.spinner('Calculating...'):
         time.sleep(0.8)
-    
     density = P / (R * T)
     spec_vol = 1 / density
-    
     st.divider()
     res_a, res_b = st.columns(2)
     res_a.metric("Fluid Density (ρ)", f"{density:.4f} kg/m³")
     res_b.metric("Specific Volume (v)", f"{spec_vol:.4f} m³/kg")
-
-st.sidebar.title("Industrial Dashboard")
-st.sidebar.write("Core Status: **Stable**")
-st.sidebar.progress(100)
