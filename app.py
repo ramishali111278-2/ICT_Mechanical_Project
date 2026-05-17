@@ -2,14 +2,30 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import time
+import base64
 
 # Page configuration
 st.set_page_config(page_title="Thermodynamics Property Finder", layout="wide")
 
-# Custom CSS for Pipes, High Intensity Steam, and Turbine
+# --- Function to play sound via Base64 ---
+def play_steam_sound(file_path):
+    try:
+        with open(file_path, "rb") as f:
+            data = f.read()
+            b64 = base64.b64encode(data).decode()
+            md = f"""
+                <audio autoplay="true">
+                <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+                </audio>
+                """
+            st.markdown(md, unsafe_allow_html=True)
+    except Exception as e:
+        # Agar file nahi milti toh error sidebar mein show hoga debugging ke liye
+        st.sidebar.error(f"Sound Error: {e}")
+
+# Custom CSS for Industrial UI and Turbine
 st.markdown("""
     <style>
-    /* Industrial Background */
     .stApp {
         background-color: #11141b;
         background-image: linear-gradient(rgba(17, 20, 27, 0.9), rgba(17, 20, 27, 0.9)),
@@ -17,75 +33,25 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Title Margin Box */
+    /* Heading Box */
     .title-box {
         border: 3px solid #4a90e2;
         padding: 20px;
-        margin: 10px auto;
         border-radius: 15px;
         text-align: center;
         background: rgba(74, 144, 226, 0.05);
+        margin-bottom: 10px;
     }
     .main-title { color: #4a90e2; font-size: 40px; font-weight: 800; text-transform: uppercase; margin: 0; }
-
-    /* Created By & Roll Number */
-    .user-info-bar {
-        background: rgba(255, 255, 255, 0.03);
-        border-bottom: 2px solid #d4af37;
-        padding: 8px 20px;
-        width: fit-content;
-        margin: 0 auto 30px auto;
-        text-align: center;
-    }
-    .user-info-text { color: #d4af37; font-size: 17px; font-family: 'Courier New', monospace; margin: 0; }
-
-    /* Turbine with Input/Output Pipes */
-    .turbine-system {
-        position: relative;
-        height: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .pipe {
-        height: 15px;
-        width: 60px;
-        background: linear-gradient(to bottom, #555, #222);
-        border: 1px solid #777;
-    }
-    .input-pipe { border-radius: 5px 0 0 5px; }
-    .output-pipe { border-radius: 0 5px 5px 0; }
     
-    .turbine-housing {
-        width: 90px;
-        height: 90px;
-        background: #1e2130;
-        border: 4px solid #3d4256;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2;
-    }
+    /* Turbine and Pipes */
+    .turbine-system { position: relative; height: 150px; display: flex; align-items: center; justify-content: center; }
+    .pipe { height: 15px; width: 60px; background: linear-gradient(to bottom, #555, #222); border: 1px solid #777; }
+    .turbine-housing { width: 90px; height: 90px; background: #1e2130; border: 4px solid #3d4256; border-radius: 50%; display: flex; justify-content: center; align-items: center; z-index: 2; }
     @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .turbine-blade { font-size: 50px; animation: rotate 1.5s linear infinite; color: #d4af37; }
 
-    /* HIGH INTENSITY STEAM Animation */
-    @keyframes steam-rise {
-        0% { transform: translateY(0) scale(1); opacity: 0; }
-        20% { opacity: 0.8; }
-        100% { transform: translateY(-180px) scale(4); opacity: 0; }
-    }
-    .steam-heavy {
-        position: absolute;
-        width: 35px;
-        height: 35px;
-        background: rgba(255, 255, 255, 0.5); /* Zyada intensity */
-        border-radius: 50%;
-        filter: blur(12px);
-        animation: steam-rise 1.2s infinite;
-    }
-    
+    /* Red Industrial Button (No Animation) */
     .stButton>button {
         background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%);
         color: white;
@@ -94,36 +60,36 @@ st.markdown("""
         height: 140px;
         border: 4px solid #2c303d;
         font-weight: bold;
-        margin: 20px auto;
         display: block;
-        z-index: 10;
+        margin: 20px auto;
+        font-size: 16px;
+        transition: 0.3s;
+    }
+    .stButton>button:hover {
+        transform: scale(1.03);
+        border-color: #ffffff;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 1. Main Heading and Profile
+# 1. Title Section
 st.markdown('<div class="title-box"><h1 class="main-title">Thermodynamics Property Finder</h1></div>', unsafe_allow_html=True)
-st.markdown('<div class="user-info-bar"><p class="user-info-text">Created by: Ramish Ali | Roll Number: 25-ME-87</p></div>', unsafe_allow_html=True)
+st.markdown('<div style="text-align:center; color:#d4af37; margin-bottom:30px; font-family:monospace;">Created by: Ramish Ali | Roll Number: 25-ME-87</div>', unsafe_allow_html=True)
 
-# 2. Sidebar with Turbine and Pipes
+# 2. Sidebar Layout
 st.sidebar.title("Industrial Dashboard")
 st.sidebar.write("Core Status: **Stable**")
-
 st.sidebar.markdown("""
     <div class="turbine-system">
-        <div class="pipe input-pipe"></div>
-        <div class="turbine-housing">
-            <div class="turbine-blade">⚙️</div>
-        </div>
-        <div class="pipe output-pipe"></div>
+        <div class="pipe" style="border-radius: 5px 0 0 5px;"></div>
+        <div class="turbine-housing"><div class="turbine-blade">⚙️</div></div>
+        <div class="pipe" style="border-radius: 0 5px 5px 0;"></div>
     </div>
-    <p style="text-align: center; color: #d4af37; font-size: 14px;">Live Turbine Cycle (In/Out Pipes)</p>
+    <p style="text-align: center; color: #d4af37; font-size: 14px;">Live Turbine Operation</p>
     """, unsafe_allow_html=True)
-
 st.sidebar.progress(100)
-st.sidebar.info("System: Optimal Flow")
 
-# 3. Content Layout
+# 3. Main Calculator UI
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
@@ -134,25 +100,23 @@ with col1:
     
     st.write("##")
     calculate = st.button("CALCULATE")
-    
-    if calculate:
-        # High Intensity Steam (More particles)
-        for i in range(12): # Particles ki tadad barha di
-            st.markdown(f'<div class="steam-heavy" style="left:{40+i*2}%; animation-delay:{i*0.1}s;"></div>', unsafe_allow_html=True)
 
 with col2:
     st.markdown("### 📊 Live P-V Analysis")
     v = np.linspace(0.1, 1.2, 100)
     p = (R * T) / v
-    chart_data = pd.DataFrame({'Vol': v, 'Pres': p})
-    st.line_chart(chart_data.set_index('Vol'))
+    st.line_chart(pd.DataFrame({'Vol': v, 'Pres': p}).set_index('Vol'))
 
-# 4. Results
+# 4. Sound & Logic Execution
 if calculate:
-    time.sleep(1.0) # Animation enjoy karne ke liye thoda wait
+    # Sound play logic (Animation is now gone)
+    play_steam_sound("steam.mp3")
+    
     density = P / (R * T)
     spec_vol = 1 / density
+    
     st.divider()
     res_a, res_b = st.columns(2)
     res_a.metric("Fluid Density (ρ)", f"{density:.4f} kg/m³")
     res_b.metric("Specific Volume (v)", f"{spec_vol:.4f} m³/kg")
+    st.success("Analysis Complete.")
