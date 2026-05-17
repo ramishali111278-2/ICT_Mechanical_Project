@@ -1,74 +1,67 @@
 import streamlit as st
 import time
 
-st.title("Thermodynamic Calculator with Steam Effect")
+# Sidebar aur Page Config (Taake interface maintain rahe)
+st.set_page_config(page_title="Steam Calc", layout="centered")
 
-# Inputs (Example)
+with st.sidebar:
+    st.header("Settings")
+    st.write("Yahan aapka side panel wapas aa gaya!")
+
+st.title("Thermodynamic Calculator")
+
+# Inputs
 pressure = st.number_input("Enter Pressure (bar):", min_value=0.1, value=1.0)
 temperature = st.number_input("Enter Temperature (°C):", min_value=0.0, value=100.0)
 
 if st.button("Calculate"):
-    # 1. Smoke/Steam CSS Animation Component
+    # REVISED Smoke Animation (Non-intrusive)
     smoke_animation = """
-    <div class="steam-container">
-        <div class="steam-bubble b1"></div>
-        <div class="steam-bubble b2"></div>
-        <div class="steam-bubble b3"></div>
+    <div class="steam-box">
+        <div class="steam-particle s1"></div>
+        <div class="steam-particle s2"></div>
+        <div class="steam-particle s3"></div>
     </div>
     <style>
-    .steam-container {
+    /* Container ko main body ke peeche rakha hai */
+    .steam-box {
         position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
+        top: 0;
+        left: 0;
+        width: 100vw;
         height: 100vh;
-        z-index: 9999;
+        z-index: -1; /* Is se background mein chala jayega, buttons gayab nahi honge */
         pointer-events: none;
-        overflow: hidden;
+        background-color: transparent;
     }
-    .steam-bubble {
+    .steam-particle {
         position: absolute;
-        bottom: -50px;
-        background: rgba(240, 240, 240, 0.4);
+        bottom: -100px;
+        background: rgba(255, 255, 255, 0.2);
         border-radius: 50%;
-        filter: blur(20px);
-        animation: floatUp 3s infinite ease-in-out;
+        filter: blur(30px);
+        animation: steamRise 4s infinite ease-out;
     }
-    .b1 { width: 120px; height: 120px; left: 40%; animation-delay: 0s; }
-    .b2 { width: 180px; height: 180px; left: 45%; animation-delay: 0.5s; }
-    .b3 { width: 140px; height: 140px; left: 52%; animation-delay: 0.2s; }
+    .s1 { width: 200px; height: 200px; left: 20%; animation-delay: 0s; }
+    .s2 { width: 300px; height: 300px; left: 50%; animation-delay: 1s; }
+    .s3 { width: 250px; height: 250px; left: 70%; animation-delay: 0.5s; }
 
-    @keyframes floatUp {
-        0% {
-            transform: translateY(0) scale(0.5);
-            opacity: 0;
-        }
-        30% {
-            opacity: 0.6;
-        }
-        100% {
-            transform: translateY(-100vh) scale(2);
-            opacity: 0;
-        }
+    @keyframes steamRise {
+        0% { transform: translateY(0) scale(1); opacity: 0; }
+        50% { opacity: 0.4; }
+        100% { transform: translateY(-120vh) scale(2); opacity: 0; }
     }
     </style>
     """
     
-    # Smoke animation render karna
+    # Animation display
     smoke_placeholder = st.markdown(smoke_animation, unsafe_allow_html=True)
     
-    # 2. Calculation delay (Taake steam ka effect thori der nazar aaye)
-    with st.spinner("Processing calculations..."):
-        time.sleep(3) # 3 seconds tak smoke chalti rahegi
+    with st.spinner("Steam Generating..."):
+        time.sleep(3)
+        result = pressure * temperature 
         
-        # Yahan aapki actual calculation logic aayegi
-        # E.g., enthalpy = func(pressure, temperature)
-        result = pressure * temperature # Just a placeholder
-        
-    # Calculation khatam hone par smoke ko screen se hata dena
-    smoke_placeholder.empty()
+    smoke_placeholder.empty() # Animation khatam
     
-    # 3. Output Display
     st.success("Calculation Done!")
     st.metric(label="Calculated Output", value=f"{result} kJ/kg")
