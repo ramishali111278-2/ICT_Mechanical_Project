@@ -6,10 +6,10 @@ import time
 # Page configuration
 st.set_page_config(page_title="Thermodynamics Property Finder", layout="wide")
 
-# Custom CSS for New Layout and Industrial Theme
+# Custom CSS for the new layout requirements
 st.markdown("""
     <style>
-    /* Industrial Background with specialized texture */
+    /* Industrial Background */
     .stApp {
         background-color: #11141b;
         background-image: 
@@ -18,36 +18,41 @@ st.markdown("""
         background-attachment: fixed;
     }
     
-    /* Top Main Heading */
-    .main-title {
+    /* Title with Margin Box */
+    .title-box {
+        border: 3px solid #4a90e2;
+        padding: 20px;
+        margin: 10px auto;
+        border-radius: 15px;
         text-align: center;
+        background: rgba(74, 144, 226, 0.05);
+        box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
+    }
+    .main-title {
         color: #4a90e2;
-        font-size: 45px;
+        font-size: 40px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-top: -30px;
-        text-shadow: 2px 2px 10px rgba(74, 144, 226, 0.3);
+        margin: 0;
     }
 
-    /* Profile Section (Below Heading) */
+    /* Created By & Roll Number Section */
     .user-info-bar {
         background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        border-radius: 10px;
-        padding: 10px 20px;
+        border-bottom: 2px solid #d4af37;
+        padding: 8px 20px;
         width: fit-content;
-        margin: 10px auto 30px auto;
+        margin: 0 auto 30px auto;
         text-align: center;
     }
     .user-info-text {
         color: #d4af37;
-        font-size: 18px;
+        font-size: 17px;
         font-family: 'Courier New', monospace;
         margin: 0;
     }
 
-    /* Industrial Circular Button with Steam Effect */
+    /* Industrial Button and Steam Effect */
     .stButton>button {
         background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%);
         color: white;
@@ -56,10 +61,8 @@ st.markdown("""
         height: 140px;
         border: 4px solid #2c303d;
         font-weight: bold;
-        font-size: 18px;
         margin: 20px auto;
         display: block;
-        transition: 0.3s;
         position: relative;
         z-index: 5;
     }
@@ -81,13 +84,17 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 1. Main Heading (Top)
-st.markdown('<h1 class="main-title">Thermodynamics Property Finder</h1>', unsafe_allow_html=True)
+# 1. Main Heading inside Margin Box
+st.markdown("""
+    <div class="title-box">
+        <h1 class="main-title">Thermodynamics Property Finder</h1>
+    </div>
+    """, unsafe_allow_html=True)
 
-# 2. Profile Section (Below Heading)
+# 2. Profile Section: Created by & Roll Number
 st.markdown("""
     <div class="user-info-bar">
-        <p class="user-info-text">User: Ramish Ali | ID: 25-ME-87</p>
+        <p class="user-info-text">Created by: Ramish Ali | Roll Number: 25-ME-87</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -95,17 +102,16 @@ st.markdown("""
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
-    st.markdown("### ⚙️ Engine Parameters")
+    # Changed heading to Input Data
+    st.markdown("### 📥 Input Data")
     R = st.number_input("Gas Constant R (J/kg-K)", value=287.0)
     T = st.number_input("Temperature (K)", value=300.0)
     P = st.number_input("Pressure (Pa)", value=101325.0)
     
     st.write("##")
-    # Circular Button
     calculate = st.button("CALCULATE")
     
     if calculate:
-        # Steam/Smoke particles
         for i in range(5):
             st.markdown(f'<div class="steam-effect" style="left:{45+i*2}%; animation-delay:{i*0.3}s;"></div>', unsafe_allow_html=True)
 
@@ -118,8 +124,8 @@ with col2:
 
 # 4. Processing and Results
 if calculate:
-    with st.spinner('Processing Steam Cycle...'):
-        time.sleep(0.8) # Wait for animation
+    with st.spinner('Calculating...'):
+        time.sleep(0.8)
     
     density = P / (R * T)
     spec_vol = 1 / density
@@ -128,11 +134,7 @@ if calculate:
     res_a, res_b = st.columns(2)
     res_a.metric("Fluid Density (ρ)", f"{density:.4f} kg/m³")
     res_b.metric("Specific Volume (v)", f"{spec_vol:.4f} m³/kg")
-    st.success("Analysis Complete.")
 
-# Sidebar for Industrial Gadgets
 st.sidebar.title("Industrial Dashboard")
-st.sidebar.markdown("---")
 st.sidebar.write("Core Status: **Stable**")
 st.sidebar.progress(100)
-st.sidebar.info("Sensor 01 Calibration: OK")
