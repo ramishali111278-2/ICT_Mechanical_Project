@@ -1,23 +1,40 @@
 import streamlit as st
 
-st.title("Thermodynamics Property Finder")
+# Custom title with color
+st.markdown("<h1 style='color:blue;text-align:center;'>Thermodynamics Property Finder</h1>", unsafe_allow_html=True)
 
-# Display your name and roll number
-st.write("Developed by **Ramish Ali**, Roll: 25-ME-87")
+# Developer info with styled box
+st.markdown(
+    "<div style='background-color:#f9f9a7;padding:10px;border-radius:8px;text-align:center;'>"
+    "Developed by <b style='color:green;'>Ramish Ali</b>, Roll: <b style='color:red;'>25-ME-87</b>"
+    "</div>",
+    unsafe_allow_html=True
+)
 
 st.header("Ideal Gas Property Calculator")
 
-# Inputs
-gas_constant = st.number_input("Enter Gas Constant R (J/kg·K)", value=287.0)
-temperature = st.number_input("Enter Temperature (K)", value=300.0)
-pressure = st.number_input("Enter Pressure (Pa)", value=101325.0)
+# Layout with columns
+col1, col2 = st.columns(2)
 
+with col1:
+    gas_constant = st.number_input("Gas Constant R (J/kg·K)", value=287.0)
+
+with col2:
+    temperature = st.number_input("Temperature (K)", value=300.0)
+
+pressure = st.number_input("Pressure (Pa)", value=101325.0)
+
+# Calculate button
 if st.button("Calculate Properties"):
-    # Density from Ideal Gas Law: rho = P / (R*T)
     density = pressure / (gas_constant * temperature)
-
-    # Specific volume: v = 1 / rho
     specific_volume = 1 / density
 
-    st.success(f"Density: {density:.3f} kg/m³")
-    st.success(f"Specific Volume: {specific_volume:.6f} m³/kg")
+    # Styled results
+    st.markdown(
+        f"<h3 style='color:purple;'>Density: {density:.3f} kg/m³</h3>",
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        f"<h3 style='color:orange;'>Specific Volume: {specific_volume:.6f} m³/kg</h3>",
+        unsafe_allow_html=True
+    )
