@@ -118,7 +118,9 @@ st.markdown("""
 
 # 3. Header
 st.markdown('<div class="title-box"><h1 style="color:#4a90e2; margin:0;">Thermodynamics Property Finder</h1></div>', unsafe_allow_html=True)
-st.write(f"<p style='text-align:center; color:#d4af37; font-size:14px;'>User: Ramish Ali | ID: 25-ME-87</p>", unsafe_allow_html=True)
+
+# Modified line below: Changed "User:" to "Created by:" and "ID:" to "Reg. No:"
+st.write(f"<p style='text-align:center; color:#d4af37; font-size:14px;'>Created by: Ramish Ali | Reg. No: 25-ME-87</p>", unsafe_allow_html=True)
 
 # 4. Sidebar with Pipe and Steam
 st.sidebar.title("Industrial Dashboard")
