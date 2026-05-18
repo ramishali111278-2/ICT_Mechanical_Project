@@ -6,7 +6,7 @@ import time
 # 1. Page Configuration
 st.set_page_config(page_title="Thermodynamics Property Finder", layout="wide")
 
-# 2. Advanced CSS for Turbine, Pipes, and Steam Animation
+# 2. Advanced CSS for Turbine, Pipes, and Lightning Borders
 st.markdown("""
     <style>
     .stApp {
@@ -15,7 +15,38 @@ st.markdown("""
             url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
     }
 
-    /* Horizontal Lightning Animation */
+    /* Lightning Glowing Box Effect */
+    .lightning-box {
+        border: 2px solid #4a90e2;
+        padding: 25px;
+        border-radius: 15px;
+        background: rgba(10, 12, 16, 0.6);
+        box-shadow: 0 0 15px rgba(74, 144, 226, 0.4), 
+                    inset 0 0 15px rgba(74, 144, 226, 0.2);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+        min-height: 480px; /* Aligns both columns nicely */
+    }
+    
+    /* Neon Top Border Animation Line */
+    .lightning-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #00f0ff, #0072ff, transparent);
+        animation: neon-glow 2s linear infinite;
+    }
+
+    @keyframes neon-glow {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    /* Horizontal Lightning Animation for Calculation */
     @keyframes horizontal-bolt {
         0% { transform: scaleX(0); opacity: 0; }
         50% { transform: scaleX(1); opacity: 1; }
@@ -27,7 +58,8 @@ st.markdown("""
         height: 6px;
         background: white;
         box-shadow: 0 0 15px 5px #4a90e2;
-        margin-top: -15px;
+        margin-top: 15px;
+        margin-bottom: 15px;
         z-index: 10;
         animation: horizontal-bolt 0.4s ease-in-out forwards;
     }
@@ -77,7 +109,7 @@ st.markdown("""
         position: relative;
     }
 
-    /* Steam Animation */
+    /* Steam Effect */
     .steam-effect {
         position: absolute;
         right: -15px;
@@ -102,25 +134,31 @@ st.markdown("""
         border-radius: 12px;
         text-align: center;
         background: rgba(74, 144, 226, 0.1);
+        margin-bottom: 20px;
     }
     
+    /* Styled Round Red Button */
     .stButton>button {
-        background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%);
-        color: white;
-        border-radius: 50%;
-        width: 140px;
-        height: 140px;
-        font-weight: bold;
-        border: 4px solid #1e2130;
+        background: radial-gradient(circle, #ff4b4b 0%, #a50000 100%) !important;
+        color: white !important;
+        border-radius: 50% !important;
+        width: 130px !important;
+        height: 130px !important;
+        font-weight: bold !important;
+        border: 4px solid #1e2130 !important;
+        box-shadow: 0 0 15px rgba(255, 75, 75, 0.4) !important;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stButton>button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px rgba(255, 75, 75, 0.7) !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
 # 3. Header
-st.markdown('<div class="title-box"><h1 style="color:#4a90e2; margin:0;">Thermodynamics Property Finder</h1></div>', unsafe_allow_html=True)
-
-# Modified line below: Changed "User:" to "Created by:" and "ID:" to "Reg. No:"
-st.write(f"<p style='text-align:center; color:#d4af37; font-size:14px;'>Created by: Ramish Ali | Reg. No: 25-ME-87</p>", unsafe_allow_html=True)
+st.markdown('<div class="title-box"><h1 style="color:#4a90e2; margin:0; font-family:sans-serif;">Thermodynamics Property Finder</h1></div>', unsafe_allow_html=True)
+st.write(f"<p style='text-align:center; color:#d4af37; font-size:15px; font-weight:bold; margin-top:-10px;'>Created by: Ramish Ali | Reg. No: 25-ME-87</p>", unsafe_allow_html=True)
 
 # 4. Sidebar with Pipe and Steam
 st.sidebar.title("Industrial Dashboard")
@@ -139,30 +177,47 @@ st.sidebar.markdown("""
     """, unsafe_allow_html=True)
 st.sidebar.info("Core Status: Stable")
 
-# 5. Main UI
+# 5. Main UI with Columns
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
+    # Div start for input lighting box
+    st.markdown('<div class="lightning-box">', unsafe_allow_html=True)
     st.markdown("### 📥 Input Parameters")
-    R = st.number_input("Gas Constant R (J/kg-K)", value=287.0)
-    T = st.number_input("Temperature (K)", value=300.0)
-    P = st.number_input("Pressure (Pa)", value=101325.0)
+    
+    R = st.number_input("Gas Constant R (J/kg-K)", value=287.0, key="gas_r")
+    T = st.number_input("Temperature (K)", value=300.0, key="temp_t")
+    P = st.number_input("Pressure (Pa)", value=101325.0, key="pres_p")
     
     st.write("##")
     calculate = st.button("CALCULATE")
     
-    if calculate:
-        st.markdown('<div class="lightning-horizontal"></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True) # Div end for input lightning box
 
 with col2:
+    # Div start for chart lighting box
+    st.markdown('<div class="lightning-box">', unsafe_allow_html=True)
     st.markdown("### 📊 P-V Diagram Analysis")
+    
     v = np.linspace(0.1, 1.0, 50)
     p = (R * T) / v
-    st.line_chart(pd.DataFrame({'Volume': v, 'Pressure': p}).set_index('Volume'))
+    chart_data = pd.DataFrame({'Volume': v, 'Pressure': p}).set_index('Volume')
+    st.line_chart(chart_data)
+    
+    st.markdown('</div>', unsafe_allow_html=True) # Div end for chart lighting box
 
-# 6. Results
+# 6. Results & Calculations
 if calculate:
+    st.markdown('<div class="lightning-horizontal"></div>', unsafe_allow_html=True)
     density = P / (R * T)
     st.divider()
-    st.metric("Fluid Density (ρ)", f"{density:.4f} kg/m³")
+    
+    # Custom styled metric block for results
+    st.markdown(f"""
+        <div style="background: rgba(74, 144, 226, 0.1); padding: 20px; border-radius: 10px; border-left: 5px solid #4a90e2;">
+            <span style="color: #aaa; font-size: 14px; uppercase; font-weight: bold;">Fluid Density (ρ)</span><br>
+            <span style="color: #00f0ff; font-size: 32px; font-weight: bold;">{density:.4f} kg/m³</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
     st.success("Lightning Strike Analysis Complete!")
